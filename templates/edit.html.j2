@@ -1,0 +1,22 @@
+{% extends 'layout.html.j2' %}
+
+{% block title %}Modifier un site{% endblock %}
+
+{% block body %}
+    <h1 class="text-center mt-5 mb-5">Modifier un site</h1>
+
+    <div class="container">
+        <div class="row">
+            <div class="jumbotron col-sm-6 offset-sm-3">
+                <form action="" method="POST">
+                    <div class="form-group">
+                        <label for="url">Nom du site:</label><br/>
+                        <input type="url" name="url" id="url" class="form-control" value="{{ site }}" />
+                    </div>
+
+                    <input class="btn btn-success float-right" type="submit" value="Modifier"/>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

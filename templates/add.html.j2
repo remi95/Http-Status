@@ -1,0 +1,23 @@
+{% extends 'layout.html.j2' %}
+
+{% block title %}Ajouter un site{% endblock %}
+
+{% block body %}
+    <h1 class="text-center mt-5 mb-5">Ajouter un site</h1>
+
+    <div class="container">
+        <div class="row">
+            <div class="jumbotron col-sm-6 offset-sm-3">
+                <form action="" method="POST">
+                    <div class="form-group">
+                        <label for="url">Nom du site:</label><br/>
+                        <input type="url" name="url" id="url" class="form-control" />
+                    </div>
+
+                    <input class="btn btn-success float-right" type="submit" value="Ajouter"/>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

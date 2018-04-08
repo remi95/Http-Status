@@ -1,0 +1,43 @@
+{% extends 'layout.html.j2' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+
+    <h1 class="text-center mt-5 mb-5">Bienvenue sur HttpStatus</h1>
+
+    <div class="container">
+        <div class="row">
+            <table class="table col-sm-12">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Site</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Historique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for site in sites %}
+                        <tr>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td><a href="{{ site[1] }}" target="_blank">{{ site[1] }}</a></td>
+                            <td class="d-flex {% if status[loop.index0] == 200 %}text-success{% else %}text-danger{% endif %}">
+                                {{ status[loop.index0] }}
+                                {% if status[loop.index0] == 200 %}
+                                    <i class="material-icons ml-3">done</i>
+                                {% else %}
+                                    <i class="material-icons ml-3">close</i>
+                                {% endif %}
+                            </td>
+                            <td><a class="btn btn-primary" href="{{ url_for('history', id=site[0]) }}" role="button">Voir l'historique</a></td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+{% endblock %}
