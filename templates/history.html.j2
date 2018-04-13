@@ -3,6 +3,8 @@
 {% block title %}Historique{% endblock %}
 
 {% block body %}
+
+    {% if status|length > 0 %}
     <h1 class="text-center mt-5 mb-5">Historique du site <a href="{{ status[0][4] }}" target="_blank">{{ status[0][4] }}</a></h1>
 
     <div class="container">
@@ -33,5 +35,11 @@
             </table>
         </div>
     </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        Il n'y a pas encore d'historique, revenez d'ici 2 minutes ;)
+    </div>
+    {% endif %}
+
 
 {% endblock %}

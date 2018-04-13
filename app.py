@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 from flask import Flask, flash, render_template, request, g, session, redirect, url_for
-import mysql.connector, hashlib, urllib, atexit, datetime, schedule, time, os, telegram
+import mysql.connector, hashlib, urllib, datetime, time, os, telegram
 from mysql.connector import Error
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -21,7 +21,6 @@ def connect_db () :
         password = app.config['DATABASE_PASSWORD'],
         database = app.config['DATABASE_NAME']
     )
-
     g.mysql_cursor = g.mysql_connection.cursor()
     return g.mysql_cursor
 
@@ -30,12 +29,23 @@ def get_db () :
         g.db = connect_db()
     return g.db
 
+def newConnectDb() :
+    mysql_connection = mysql.connector.connect(
+        host = app.config['DATABASE_HOST'],
+        user = app.config['DATABASE_USER'],
+        password = app.config['DATABASE_PASSWORD'],
+        database = app.config['DATABASE_NAME']
+    )
+    return mysql_connection
+
 def getHttpCode (url) :
     try :
         request = urllib.request.urlopen(url)
         return request.getcode()
     except urllib.error.HTTPError as error :
         return error.code
+    except urllib.error.URLError as error :
+        return error.reason
 
 def isUrlCorrect (url) :
     try :
@@ -65,19 +75,52 @@ def insertStatusCode () :
     db.executemany(sql, datas)
     g.mysql_connection.commit()
 
-def sendSlackMessage () :
+def autoInsertStatusCode () :
+    db = newConnectDb()
+    cursor = db.cursor()
+    cursor.execute("SELECT id, url FROM sites")
+    sites = cursor.fetchall()
+    date = datetime.datetime.now()
+    datas = []
+
+    for site in sites:
+        code = getHttpCode(site[1])
+        if code != 200 :
+            if isDown(site[0]) :
+                sendSlackMessage(site[1], code)
+                sendTelegramMessage(site[1], code)
+        datas.append((site[0], code, date))
+
+    sql = "INSERT INTO status VALUES(DEFAULT, %s, %s, %s)"
+    cursor.executemany(sql, datas)
+    db.commit()
+    cursor.close()
+    db.close()
+
+def sendSlackMessage (url, code) :
     slack_token = app.config['SLACK_TOKEN']
     sc = SlackClient(slack_token)
     sc.api_call(
         "chat.postMessage",
         channel=app.config['SLACK_CHANNEL'],
-        text="Hello from Python! :tada:"
+        text="Bonjour, il semblerait qu'il y ai un problème avec votre site "+ url +". Statut : "+ str(code)
     )
 
-def sendTelegramMessage () :
+def sendTelegramMessage (url, code) :
     telegram_token = app.config['TELEGRAM_TOKEN']
     bot = telegram.Bot(token=telegram_token)
-    bot.send_message(chat_id=app.config['TELEGRAM_CHAT_ID'], text="Hello from my Python App :)")
+    bot.send_message(chat_id=app.config['TELEGRAM_CHAT_ID'], text="Bonjour, il semblerait qu'il y ai un problème avec votre site "+ url +". Statut : "+ str(code))
+
+def isDown (id) :
+    db = newConnectDb()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM status WHERE site_id = %(id)s ORDER BY date DESC LIMIT 3", {'id' : id})
+    lastStatus = cursor.fetchall()
+    for status in lastStatus :
+        if status[2] != 200 :
+            return False
+    return True
+
 
 # Ferme les BDD à la fin de l'execution
 @app.teardown_appcontext
@@ -136,8 +179,7 @@ def admin () :
     db.execute("SELECT id, url FROM sites")
     sites = db.fetchall()
     status = getStatus(sites)
-
-    insertStatusCode()
+    # insertStatusCode()
     # sendSlackMessage()
     # sendTelegramMessage()
 
@@ -152,7 +194,7 @@ def add () :
 
     if url is not None:
         db = get_db()
-        if (isUrlCorrect(url) == True) :
+        if type(getHttpCode(url)) is int :
             db.execute("INSERT INTO sites(id, url) VALUES(DEFAULT, '%s')"%(str(url)))
             g.mysql_connection.commit()
             flash("Le site " + url + " a bien été ajouté à la liste")
@@ -198,7 +240,7 @@ def delete (id) :
     g.mysql_connection.commit()
 
     if db.rowcount > 0 :
-        flash("Le site ayant l'id " + str(id) + " ne semble pas exister")
+        flash("Le site ayant l'id " + str(id) + " a bien été supprimé")
     else :
         flash("Le site ayant l'id " + str(id) + " n'a pas pu être supprimé")
 
@@ -216,26 +258,15 @@ def history (id) :
     status = db.fetchall()
     return render_template('history.html.j2', user = user, status = status)
 
+with app.app_context():
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(
+            func=autoInsertStatusCode,
+            trigger=IntervalTrigger(seconds=10),
+            replace_existing=True,
+        )
+        scheduler.start()
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-    # scheduler = BackgroundScheduler()
-    #
-    # # scheduler.add_job(
-    # #     func=insertStatusCode(),
-    # #     trigger=IntervalTrigger(seconds=5),
-    # #     id='http_status_code',
-    # #     replace_existing=True
-    # # )
-    # scheduler.add_job(
-    #     insertStatusCode,
-    #     'interval',
-    #     seconds=5
-    # )
-    # scheduler.start()
-    # # atexit.register(lambda: scheduler.shutdown())
-    # try :
-    #     while True :
-    #         time.sleep(2)
-    # except (KeyboardInterrupt, SystemExit) :
-    #     scheduler.shutdown()
