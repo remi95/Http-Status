@@ -2,10 +2,10 @@
 -- version 4.5.4.1deb2ubuntu2
 -- http://www.phpmyadmin.net
 --
--- Client :  localhost
--- Généré le :  Jeu 05 Avril 2018 à 19:59
--- Version du serveur :  5.7.21-0ubuntu0.16.04.1
--- Version de PHP :  7.0.28-0ubuntu0.16.04.1
+-- Host: localhost
+-- Generation Time: Apr 14, 2018 at 07:13 PM
+-- Server version: 5.7.21-0ubuntu0.16.04.1
+-- PHP Version: 7.0.28-0ubuntu0.16.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,74 +17,79 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données :  `http_status`
+-- Database: `http_status`
 --
+CREATE DATABASE IF NOT EXISTS `http_status` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `http_status`;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `sites`
+-- Table structure for table `sites`
 --
 
-CREATE TABLE `sites` (
-  `id` int(11) NOT NULL,
-  `url` varchar(255) CHARACTER SET utf8 NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `sites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `url` varchar(255) NOT NULL,
+  `last_message` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `sites`
+--
+
+INSERT INTO `sites` (`id`, `url`, `last_message`) VALUES
+(34, 'http://www.remimafat.fr', NULL),
+(42, 'https://www.stackoverflow.com', NULL),
+(43, 'https://material.io/icons/', NULL),
+(44, 'http://www.remimafat.fr/fakeurl', '2018-04-14 19:03:53');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `status`
+-- Table structure for table `status`
 --
 
-CREATE TABLE `status` (
-  `id` int(11) NOT NULL,
-  `site` varchar(255) CHARACTER SET utf8 NOT NULL,
+CREATE TABLE IF NOT EXISTS `status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `site_id` int(11) NOT NULL,
   `status` int(11) NOT NULL,
-  `date` datetime NOT NULL
+  `date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_site_id` (`site_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
--- Index pour les tables exportées
+-- Table structure for table `user`
+--
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `password` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `name`, `password`) VALUES
+(1, 'remi', 'b1390485e7bc98ac369225388dd68b06d6c978e90ad904d234c2e698b8852aef'),
+(2, 'admin', 'b1390485e7bc98ac369225388dd68b06d6c978e90ad904d234c2e698b8852aef');
+
+--
+-- Constraints for dumped tables
 --
 
 --
--- Index pour la table `sites`
---
-ALTER TABLE `sites`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `url` (`url`);
-
---
--- Index pour la table `status`
+-- Constraints for table `status`
 --
 ALTER TABLE `status`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `site` (`site`);
-
---
--- AUTO_INCREMENT pour les tables exportées
---
-
---
--- AUTO_INCREMENT pour la table `sites`
---
-ALTER TABLE `sites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `status`
---
-ALTER TABLE `status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- Contraintes pour les tables exportées
---
-
---
--- Contraintes pour la table `sites`
---
-ALTER TABLE `sites`
-  ADD CONSTRAINT `site` FOREIGN KEY (`url`) REFERENCES `status` (`site`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_site_id` FOREIGN KEY (`site_id`) REFERENCES `sites` (`id`) ON DELETE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
