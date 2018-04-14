@@ -5,7 +5,6 @@ Si 3 erreurs consécutives surviennent sur l'un des sites, un message _slack_ et
 
 - [Prérequis pour les messages Slack](#prérequis-pour-les-messages-slack)
 - [Prérequis pour les messages Telegram](#prérequis-pour-les-messages-telegram)
-- [Prérequis pour l'automatisation du monitoring](#prérequis-pour-lautomatisation-du-monitoring)
 - [Installation](#installation)
 
 ## Prérequis pour les messages Slack
@@ -35,25 +34,29 @@ Et voilà ! BotFather vous donne le **Token** de votre Bot dont vous aurez besoi
 
 Pour finir, vous aurez aussi besoin de l'id de la personne que vous voudrez contacter, en l'occurrence l'administrateur du site !
 
-## Prérequis pour l'automatisation du monitoring
-
-```sh
-sudo pip install apscheduler
-```
-
 ## Installation
 
+Si vous ne les avez pas encore, installez :
+- Flask `sudo pip3 install flask` 
+- WSGI `sudo apt-get install apache2 libapache2-mod-wsgi-py3`
+- Mysql.connector `sudo apt-get install python3-mysql.connector` 
+- APScheduler `sudo pip install apscheduler`
+
+Maintenant, installez le site :
+
 ```sh
-git clone https://github.com/remi95/Http-Status.git
-cd Http-Status
+cd /var/www/html/
+git clone https://github.com/remi95/Http-Status.git http-status
+cd http-status
 mysql -u root -p < http_status.sql
 sudo cp http-status.conf /etc/apache2/sites-available/http-status.conf
 sudo ln -s /etc/apache2/sites-available/http-status.conf /etc/apache2/sites-enabled/http-status.conf
 sudo /etc/init.d/apache2 restart
 ```
 
-Modifiez le fichier _/etc/hosts_ et ajoutez-y la ligne suivante `127.0.0.1	dev.http-status.loc`.      
+Modifiez le fichier _/etc/hosts_ et ajoutez-y la ligne suivante `127.0.0.1	dev.http-status.loc`.  
 
 Vous trouverez dans le dossier un fichier nommé _configure_secret_config.py_, copiez-le ou renommez-le en **secret_config.py**. Remplacez les valeurs avec celles qui correspondent à votre serveur, ainsi qu'avec vos tokens et identifiants de Chat Slack et Telegram, comme vu précédemment.     
 
+Vous pouvez désormais vous connecter sur le site à l'url **http://dev.http-status.loc**    
 Pour vous connecter à la partie Admin vous aurez besoin des identifiants suivants : `admin / erty`
