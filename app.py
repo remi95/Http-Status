@@ -234,7 +234,7 @@ def delete (id) :
 
     db = get_db()
     db.execute("SELECT * FROM sites WHERE id = %(id)s", ({'id': id}))
-    db.fetchone()
+    site = db.fetchone()
 
     if db.rowcount > 0 :
         if request.method == 'POST' :
@@ -247,7 +247,7 @@ def delete (id) :
                 flash("Le site ayant l'id " + str(id) + " n'a pas pu être supprimé")
             return redirect(url_for('admin'))
         else :
-            return render_template('delete.html.j2', user = session['user'])
+            return render_template('delete.html.j2', user = session['user'], site = site[1])
     else :
         flash("Le site ayant l'id " + str(id) + " ne semble pas exister")
         return redirect(url_for('admin'))

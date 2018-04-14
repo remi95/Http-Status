@@ -43,7 +43,7 @@ INSERT INTO `sites` (`id`, `url`, `last_message`) VALUES
 (34, 'http://www.remimafat.fr', NULL),
 (42, 'https://www.stackoverflow.com', NULL),
 (43, 'https://material.io/icons/', NULL),
-(44, 'http://www.remimafat.fr/fakeurl', '2018-04-14 19:03:53');
+(44, 'http://www.remimafat.fr/fakeurl', NULL);
 
 -- --------------------------------------------------------
 
