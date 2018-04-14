@@ -54,4 +54,6 @@ sudo /etc/init.d/apache2 restart
 
 Modifiez le fichier _/etc/hosts_ et ajoutez-y la ligne suivante `127.0.0.1	dev.http-status.loc`.      
 
-Vous trouverez dans le dossier un fichier nommé _configure_secret_config.py_, copiez-le ou renommez-le en **secret_config.py**. Remplacez les valeurs avec celles qui correspondent à votre serveur, ainsi qu'avec vos tokens et identifiants de Chat Slack et Telegram, comme vu précédemment.
+Vous trouverez dans le dossier un fichier nommé _configure_secret_config.py_, copiez-le ou renommez-le en **secret_config.py**. Remplacez les valeurs avec celles qui correspondent à votre serveur, ainsi qu'avec vos tokens et identifiants de Chat Slack et Telegram, comme vu précédemment.     
+
+Pour vous connecter à la partie Admin vous aurez besoin des identifiants suivants : `admin / erty`
